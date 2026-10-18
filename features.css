@@ -1,0 +1,327 @@
+/* =====================================================================
+   ФОРМА — features.css (правки v3, исполнитель C)
+   Подключается после всех стилей. Только desktop 1280–1920.
+   Анимируем только transform и opacity.
+
+   Разделы:
+    1. Блок 4 «Куратор»: раскладка, факты, лучи
+    2. Блок 4: телефон (рамка, статус-бар, шапка чата, поле ввода)
+    3. Блок 4: лента переписки (статичный режим и плеер), пузыри, видео, луч по кадру
+    4. Блок 4: кнопка «Смотреть заново»
+    5. Плашка квиза (П12)
+    6. Уведомление о покупке (П14)
+    7. prefers-reduced-motion
+   ===================================================================== */
+
+/* ---------- 1. Блок 4 «Куратор»: раскладка ---------- */
+.tech.kurator {
+  position: relative; overflow: hidden; isolation: isolate;
+  padding: 56px 0;
+  background: var(--color-milk); color: var(--color-ink);
+}
+.kurator > .container.kurator__inner {
+  position: relative; z-index: var(--z-content);
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: auto;
+  column-gap: var(--gutter); align-items: center;
+}
+.kurator .kurator__text { grid-column: 1 / 7; grid-row: 1; padding-right: 24px; }
+.kurator .kurator__stage {
+  grid-column: 7 / 13; grid-row: 1;
+  display: flex; align-items: flex-end; gap: 32px; padding-left: 24px;
+}
+
+.kurator .kurator__eyebrow { color: var(--color-ember); margin-bottom: 20px; }
+.kurator .tech__head { margin: 0; }
+.kurator .tech__title { max-width: none; text-wrap: balance; }
+.kurator .tech__lead { margin-top: 20px; max-width: 40ch; color: var(--color-bark); font-size: var(--fs-body-l); line-height: var(--lh-text); }
+
+/* Три факта (вместо выносок): номер-иконка + текст, волоски между строками */
+.kurator .kurator__facts { margin: 32px 0 0; padding: 0; list-style: none; max-width: 520px; }
+.kurator .kurator__fact {
+  position: relative; display: grid; grid-template-columns: 72px 1fr; align-items: center; column-gap: 16px;
+  min-height: 60px; padding: 10px 0;
+  border-top: 1px solid var(--color-hair-light);
+}
+.kurator .kurator__fact:last-child { border-bottom: 1px solid var(--color-hair-light); }
+.kurator .kurator__fact::before { /* «луч» подсвечивает факт, когда он случился в переписке */
+  content: ""; position: absolute; z-index: -1; inset: 0 -16px;
+  background: linear-gradient(90deg, rgba(255, 213, 151, 0.55), rgba(255, 213, 151, 0) 85%);
+  opacity: 0; transform: scaleX(0.4); transform-origin: left center;
+  transition: opacity 480ms var(--ease-light), transform 640ms var(--ease-light);
+}
+.kurator .kurator__fact.is-lit::before { opacity: 1; transform: none; }
+.kurator .kurator__fact-text { margin: 0; font-size: var(--fs-body-l); line-height: 1.4; color: var(--color-ink); }
+.kurator .kurator__fact-icon { justify-self: start; display: inline-flex; align-items: center; justify-content: center; color: var(--color-ember); }
+.kurator .kurator__fact-icon--tc {
+  height: 26px; padding: 0 9px; border-radius: var(--radius-xs);
+  background: var(--color-ray); color: var(--color-night);
+  font-size: 14px; font-weight: var(--fw-text-medium); font-variant-numeric: tabular-nums;
+}
+.kurator .kurator__fact-icon--num {
+  font-family: var(--font-display); font-weight: var(--fw-display); font-size: var(--fs-h5); line-height: 1;
+  letter-spacing: var(--ls-display); text-transform: uppercase;
+}
+.kurator .kurator__fact-icon--num small { margin-left: 2px; font-size: 0.6em; }
+.kurator .kurator__fact-icon svg { width: 28px; height: 28px; }
+
+.kurator .tech__note { margin: 20px 0 0; max-width: 46ch; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--color-smoke); }
+.kurator .tech__actions { margin-top: 24px; }
+
+/* Факты появляются каскадом (только когда JS и движение разрешены) */
+.kurator--anim .kurator__fact { opacity: 0; transform: translateY(24px); }
+.kurator--anim .kurator__fact.is-in {
+  opacity: 1; transform: none;
+  transition: opacity var(--dur-reveal) var(--ease-light), transform var(--dur-reveal) var(--ease-light);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+
+/* Лучи за телефоном: «дышат» (opacity + лёгкий сдвиг), только пока блок в кадре */
+.kurator__rays { position: absolute; z-index: var(--z-beams); inset: 0; pointer-events: none; overflow: hidden; }
+.kurator__ray {
+  position: absolute; top: -20%; left: 64%; width: 220px; height: 150%;
+  background: linear-gradient(90deg, rgba(255, 213, 151, 0), rgba(255, 213, 151, 0.55) 50%, rgba(255, 213, 151, 0));
+  transform: rotate(24deg); transform-origin: top center; opacity: 0.7;
+}
+.kurator__ray--2 { left: 80%; width: 120px; opacity: 0.45; }
+.kurator.is-inview .kurator__ray { animation: kurator-breathe 7s ease-in-out infinite alternate; }
+.kurator.is-inview .kurator__ray--2 { animation-duration: 9s; animation-delay: -3s; }
+@keyframes kurator-breathe {
+  from { opacity: 0.45; transform: rotate(24deg) translateX(-12px); }
+  to   { opacity: 0.9;  transform: rotate(24deg) translateX(12px); }
+}
+
+/* ---------- 2. Телефон ---------- */
+.kurator .kurator__phone {
+  flex: none; position: relative;
+  width: 380px; height: clamp(540px, calc(100vh - 72px - 112px), 720px);
+  border: 10px solid var(--n-800); border-radius: var(--radius-phone);
+  background: var(--color-night); color: var(--color-milk);
+  box-shadow: var(--shadow-paper), 0 0 0 1px rgba(20, 16, 13, 0.08);
+  overflow: hidden;
+}
+.kurator .kurator__phone::after { /* боковые кнопки — тонкие «засечки» на рамке */
+  content: ""; position: absolute; top: 120px; right: -13px; width: 3px; height: 64px; border-radius: 2px; background: var(--n-800);
+}
+.kurator .chat { display: flex; flex-direction: column; height: 100%; }
+
+/* Статус-бар */
+.kurator .kurator__statusbar {
+  position: relative; flex: none; display: flex; align-items: center; justify-content: space-between;
+  height: 34px; padding: 0 22px 0 26px;
+  font-size: 13px; font-weight: var(--fw-text-medium); font-variant-numeric: tabular-nums; color: var(--color-milk);
+}
+.kurator .kurator__island {
+  position: absolute; top: 7px; left: 50%; width: 92px; height: 24px; margin-left: -46px;
+  border-radius: var(--radius-pill); background: #000;
+}
+.kurator .kurator__icons { display: inline-flex; align-items: center; gap: 5px; }
+.kurator .kurator__icons svg { display: block; height: 11px; width: auto; fill: currentColor; }
+
+/* Шапка чата */
+.kurator .chat__head { height: 60px; padding: 8px 16px; column-gap: 10px; }
+.kurator .chat__status-text { display: inline-block; min-width: 7ch; transition: opacity var(--dur-fast) var(--ease-light); }
+.kurator .chat.is-typing .chat__status-text { color: var(--color-ray); }
+
+/* Поле ввода (декор) */
+.kurator .kurator__composer {
+  flex: none; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 12px 6px;
+}
+.kurator .kurator__composer-field {
+  flex: 1; display: flex; align-items: center; height: 34px; padding: 0 14px;
+  border: 1px solid var(--color-hair-dark); border-radius: var(--radius-pill);
+  font-size: 13px; color: var(--n-500);
+}
+.kurator .kurator__composer-send {
+  flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--color-room-hi); color: var(--color-ray);
+}
+.kurator .kurator__composer-send svg { width: 14px; height: 14px; }
+
+/* ---------- 3. Лента переписки ---------- */
+/* Статичный режим (без JS и при reduced-motion): вся переписка, прокрутка внутри экрана */
+.kurator .kurator__viewport {
+  position: relative; flex: 1; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: rgba(255, 213, 151, 0.4) transparent;
+}
+.kurator .kurator__viewport::-webkit-scrollbar { width: 4px; }
+.kurator .kurator__viewport::-webkit-scrollbar-thumb { background: rgba(255, 213, 151, 0.4); border-radius: 2px; }
+.kurator .kurator__feed {
+  display: flex; flex-direction: column; gap: 6px;
+  margin: 0; padding: 12px 12px 10px; list-style: none;
+}
+
+/* Режим плеера: как мессенджер — лента прижата к низу, старые сообщения уезжают вверх, без скролла */
+.kurator--player .kurator__viewport { overflow: hidden; }
+.kurator--player .kurator__viewport::before { /* мягкий край сверху: сообщения уходят под шапку */
+  content: ""; position: absolute; z-index: 2; top: 0; left: 0; right: 0; height: 28px;
+  background: linear-gradient(180deg, var(--color-night), rgba(20, 16, 13, 0));
+  pointer-events: none;
+}
+.kurator--player .kurator__feed { position: absolute; left: 0; right: 0; bottom: 0; }
+.kurator--player .kurator__feed > li {
+  transition: opacity 320ms var(--ease-light), transform 320ms var(--ease-light);
+}
+.kurator--player .kurator__feed > .is-pending { display: none; }
+.kurator--player .kurator__feed > .is-entering { opacity: 0; transform: translateY(12px); }
+.kurator--player .kurator__feed > .chat__msg--out.is-entering { transform: translate(8px, 12px); }
+
+/* Пузыри: компактнее, время — внутри пузыря справа снизу */
+.kurator .chat__msg { display: flow-root; max-width: 82%; padding: 7px 11px 6px; font-size: 14px; line-height: 1.4; }
+.kurator .chat__msg--video { padding: 5px 5px 6px; }
+.kurator .chat__msg:not(.chat__msg--video) .chat__text { display: inline; }
+.kurator .chat__msg:not(.chat__msg--video) .chat__meta { float: right; margin: 5px 0 -2px 10px; }
+.kurator .chat__meta { font-size: 11px; color: var(--n-300); }
+.kurator .chat__tc { height: 22px; padding: 0 7px; font-size: 13px; }
+
+/* Разделители дней */
+.kurator .chat__day {
+  align-self: center; margin: 4px 0 2px; padding: 3px 10px; border-radius: var(--radius-pill);
+  background: rgba(245, 235, 221, 0.07);
+  font-size: 11px; font-weight: var(--fw-text-medium); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--n-300);
+}
+
+/* «Печатает…» */
+.kurator .chat__typing {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 4px;
+  height: 34px; padding: 0 14px; border-radius: var(--radius-bubble-in); background: var(--color-room);
+}
+.kurator .chat__typing i {
+  display: block; width: 6px; height: 6px; border-radius: 50%; background: var(--n-300);
+  animation: kurator-dot 900ms ease-in-out infinite;
+}
+.kurator .chat__typing i:nth-child(2) { animation-delay: 150ms; }
+.kurator .chat__typing i:nth-child(3) { animation-delay: 300ms; }
+@keyframes kurator-dot {
+  0%, 60%, 100% { opacity: 0.35; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* Видео-пузыри */
+.kurator .video, .kurator .video .video__media { width: 200px; }
+.kurator .video .video__media { height: 228px; }
+.kurator .video--small, .kurator .video--small .video__media { width: 168px; }
+.kurator .video--small .video__media { height: 188px; }
+.kurator .video .video__play { top: 90px; left: 76px; }
+.kurator .video--small .video__play { top: 70px; left: 60px; }
+.kurator .video__track { margin: 10px 6px 4px; }
+.kurator .video__file { margin-top: 4px; }
+.kurator .video .video__media::after { display: none; } /* вместо общей полосы — свой луч ниже */
+.kurator .video__mark::after { bottom: 14px; }
+
+/* Луч по кадру к метке таймкода: движется только transform */
+.kurator .video__beam {
+  position: absolute; z-index: 1; top: 0; left: 0; width: 200px; height: 228px;
+  border-radius: 12px; overflow: hidden; pointer-events: none;
+}
+.kurator .video__beam-move {
+  position: absolute; inset: 0;
+  transform: translateX(-20%); opacity: 0;
+  transition: transform 600ms var(--ease-move), opacity 240ms var(--ease-light);
+}
+.kurator .video__beam-move::before { /* сама полоса света, наклон −24° как у лучей страницы */
+  content: ""; position: absolute; top: -20%; bottom: -20%; left: -30px; width: 60px;
+  background: linear-gradient(90deg, rgba(255, 213, 151, 0), rgba(255, 226, 180, 0.85) 50%, rgba(255, 213, 151, 0));
+  mix-blend-mode: screen; transform: skewX(-24deg);
+}
+.kurator .video__beam-move::after { /* тонкая вертикаль точно над меткой */
+  content: ""; position: absolute; top: 0; bottom: 0; left: -1px; width: 2px; background: rgba(255, 213, 151, 0.9);
+}
+.kurator .video__beam-tc {
+  position: absolute; top: 10px; left: 0; height: 22px; padding: 0 7px; display: inline-flex; align-items: center;
+  border-radius: var(--radius-xs); background: var(--color-ray); color: var(--color-night);
+  font-size: 12px; font-weight: var(--fw-text-medium); font-variant-numeric: tabular-nums;
+  transform: translateX(-50%);
+}
+.kurator .video.is-scrubbing .video__beam-move { opacity: 1; transform: translateX(var(--scrub, 0%)); }
+.kurator .video.is-scrubbing .video__media img { filter: saturate(0.85) brightness(0.85); }
+.kurator .video__media img { transition: filter var(--dur-base) var(--ease-light); }
+
+/* Невысокие экраны (1280×720, 1366×768): блок остаётся в пределах экрана */
+@media (max-height: 820px) {
+  .tech.kurator { padding: 40px 0; }
+  .kurator .tech__title { font-size: var(--fs-h3); }
+  .kurator .kurator__eyebrow { margin-bottom: 14px; }
+  .kurator .tech__lead { margin-top: 14px; font-size: var(--fs-body); }
+  .kurator .kurator__facts { margin-top: 20px; }
+  .kurator .kurator__fact { min-height: 50px; padding: 6px 0; }
+  .kurator .kurator__fact-text { font-size: var(--fs-body); }
+  .kurator .tech__note { margin-top: 14px; }
+  .kurator .tech__actions { margin-top: 18px; }
+  .kurator .kurator__phone { height: clamp(520px, calc(100vh - 72px - 80px), 720px); }
+  .kurator .video .video__media, .kurator .video__beam { height: 176px; }
+  .kurator .video .video__play { top: 64px; }
+  .kurator .video--small .video__media { height: 148px; }
+  .kurator .video--small .video__play { top: 50px; }
+}
+
+/* ---------- 4. «Смотреть заново» ---------- */
+.kurator .kurator__replay { flex: none; margin-bottom: 8px; gap: 10px; }
+.kurator .kurator__replay svg { width: 18px; height: 18px; flex: none; transition: transform 480ms var(--ease-light); }
+.kurator .kurator__replay:hover svg { transform: rotate(-180deg); }
+.kurator .kurator__replay.is-ready { border-color: var(--color-ink); }
+/* 1280–1439: справа от телефона мало места — кнопка в столбик (иконка над подписью) */
+@media (max-width: 1439px) {
+  .kurator .kurator__stage { gap: 20px; padding-left: 12px; }
+  .kurator .kurator__replay {
+    flex-direction: column; gap: 8px; width: 116px; min-height: 0; padding: 14px 10px;
+    white-space: normal; line-height: 1.25; text-align: center;
+  }
+}
+
+/* ---------- 5. Плашка квиза (П12) ---------- */
+.fnudge {
+  position: fixed; z-index: var(--z-toast); left: 50%; bottom: 24px;
+  display: flex; align-items: center; gap: 16px;
+  max-width: calc(100vw - 48px); padding: 10px 10px 10px 24px;
+  border: 1px solid var(--n-800); border-radius: var(--radius-pill);
+  background: var(--color-room); color: var(--color-milk); box-shadow: var(--shadow-modal);
+  opacity: 0; transform: translate(-50%, 16px); pointer-events: none;
+  transition: opacity 320ms var(--ease-light), transform 400ms var(--ease-light);
+}
+.fnudge.is-open { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.fnudge.is-open.is-dodged { opacity: 0; pointer-events: none; }
+.fnudge__text { margin: 0; font-size: var(--fs-body); line-height: 1.4; white-space: nowrap; }
+.fnudge__go { min-height: 44px; padding: 0 22px; border-color: rgba(255, 213, 151, 0.6); color: var(--color-ray); }
+.fnudge__go:hover { border-color: var(--color-ray); background: rgba(255, 213, 151, 0.08); }
+.fnudge__close, .ftoast__close {
+  flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  border: 0; border-radius: 50%; background: none; color: var(--n-300); cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-light), color var(--dur-fast) var(--ease-light);
+}
+.fnudge__close:hover, .ftoast__close:hover { background: rgba(245, 235, 221, 0.08); color: var(--color-milk); }
+.fnudge__close svg, .ftoast__close svg { width: 14px; height: 14px; }
+
+/* ---------- 6. Уведомление о покупке (П14) ---------- */
+.ftoast {
+  position: fixed; z-index: var(--z-toast); left: 24px; bottom: 24px;
+  display: grid; grid-template-columns: 40px 1fr 44px; align-items: center; column-gap: 12px;
+  width: 360px; padding: 12px 6px 12px 14px;
+  border: 1px solid var(--n-800); border-radius: var(--radius-m);
+  background: var(--color-room); color: var(--color-milk); box-shadow: var(--shadow-modal);
+  opacity: 0; transform: translateY(16px); pointer-events: none;
+  transition: opacity 320ms var(--ease-light), transform 400ms var(--ease-light);
+}
+.ftoast.is-open { opacity: 1; transform: none; pointer-events: auto; }
+.ftoast.is-open.is-dodged { opacity: 0; pointer-events: none; }
+.ftoast__avatar {
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  background: var(--color-ray); color: var(--color-night);
+  font-family: var(--font-display); font-weight: var(--fw-display); font-size: 22px; line-height: 1;
+}
+.ftoast__body { min-width: 0; }
+.ftoast__text { margin: 0; font-size: var(--fs-small); line-height: 1.4; color: var(--color-milk); }
+.ftoast__text b { font-weight: var(--fw-text-medium); }
+.ftoast__time { margin: 2px 0 0; font-size: 12px; color: var(--n-300); }
+
+/* ---------- 7. prefers-reduced-motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .kurator.is-inview .kurator__ray { animation: none; }
+  .kurator .chat__typing i { animation: none; opacity: 0.7; }
+  .kurator .video__beam-move, .kurator .kurator__fact::before,
+  .fnudge, .ftoast { transition: opacity 0ms; }
+  .kurator .kurator__replay svg { transition: none; }
+}
+
+/* Мини-таймер в шапке (Д9): цифры не прыгают при смене */
+.header__chip--timer { font-variant-numeric: tabular-nums; white-space: nowrap; }

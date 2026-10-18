@@ -1,0 +1,246 @@
+/* =====================================================================
+   ФОРМА — «Перезагрузка за 8 недель»
+   Дизайн-система концепции 1 «Луч». Только desktop 1440px (этап 3, 18.10.2026).
+   Источник правды: проект/03-дизайн.md. Копировать в сайт/styles.css целиком.
+
+   Шрифты подключить в <head>:
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Sofia+Sans+Extra+Condensed:wght@700;800&display=swap" rel="stylesheet">
+   Helvetica Neue — системный шрифт, ничего не грузим.
+
+   Контраст (WCAG 2.1) посчитан скриптом, цифры — в комментариях.
+   Правило: «·» как разделитель нигде не используем (решение пользователя).
+   ===================================================================== */
+
+:root {
+  /* ---------- 1. Цвет: база «Луч» ---------- */
+  --color-night:      #14100D; /* фон: комната до рассвета (основной тёмный фон) */
+  --color-room:       #2A2019; /* поверхности на тёмном: вкладки, карточки, квиз */
+  --color-room-hi:    #3A2D23; /* приподнятая поверхность: hover карточек, пузыри чата куратора */
+  --color-soot:       #1C1612; /* футер, поля ввода на тёмном */
+
+  --color-milk:       #F5EBDD; /* основной текст на тёмном; светлый фон «освещённой комнаты» */
+  --color-paper-2:    #EDE0CC; /* второй светлый фон (блок 5), чтобы соседние светлые блоки различались */
+  --color-paper-hi:   #FBF5EC; /* пузыри отзывов на светлом фоне */
+
+  --color-ray:        #FFD597; /* ЛУЧ: подсветка цифр, активные метки, фокус на тёмном. На night 13.7:1 */
+  --color-ray-hi:     #FFF1DA; /* блик, пробегающий по «6–10 СМ» */
+  --color-dawn:       #FF9F4A; /* РАССВЕТ: только главная кнопка и главный акцент. Текст на ней night 9.3:1 */
+  --color-dawn-hover: #FFB46E; /* hover главной кнопки, night на нём 10.8:1 */
+  --color-dawn-press: #F08A33; /* active главной кнопки, night на нём 7.6:1 */
+  --color-ember:      #9A420B; /* акцентный ТЕКСТ и фокус на светлом фоне: milk 5.6:1, paper-2 5.1:1 */
+
+  /* ---------- 2. Нейтральные (тёплый графит → молоко) ---------- */
+  --n-950: #14100D; /* = night */
+  --n-900: #1C1612; /* = soot */
+  --n-850: #2A2019; /* = room */
+  --n-800: #3A2D23; /* = room-hi */
+  --n-600: #85766A; /* границы полей на тёмном: на room 3.6:1, на night 4.3:1 (UI ≥ 3:1) */
+  --n-500: #9C8E7E; /* мета-текст на тёмном: night 5.9:1, room 5.0:1. НЕ ставить на n-800 (4.2:1) */
+  --n-300: #CDBFAD; /* вторичный текст на тёмном: night 10.5:1, room 8.8:1, room-hi ок */
+  --n-100: #F5EBDD; /* = milk */
+
+  /* Текст на светлом фоне */
+  --color-ink:   #14100D; /* основной: milk 16:1, paper-2 14.5:1 */
+  --color-bark:  #4A3E34; /* вторичный: milk 8.8:1, paper-2 8.0:1 */
+  --color-smoke: #6E6052; /* мета, сноски: milk 5.2:1, paper-2 4.7:1 */
+  --color-rule-light: #8A7A6A; /* границы полей/кнопок на светлом: milk 3.5:1, paper-2 3.2:1 */
+
+  /* Линии-«волоски» (декоративные, контраст не требуется) */
+  --color-hair-dark:  rgba(255, 213, 151, 0.18); /* линии на тёмном (оттенок луча) */
+  --color-hair-light: rgba(20, 16, 13, 0.14);    /* линии на светлом */
+
+  /* ---------- 3. Семантические ---------- */
+  --color-success:       #8FD3A6; /* на тёмном: night 10.9:1 */
+  --color-success-ink:   #2C6E46; /* на светлом: milk 5.2:1, paper-2 4.7:1 */
+  --color-error:         #FF8F7A; /* на тёмном: night 8.5:1 */
+  --color-error-ink:     #B3261E; /* на светлом: milk 5.5:1, paper-2 5.0:1 */
+
+  /* ---------- 4. Свет по времени суток (шкала дня, лучи) ---------- */
+  --light-morning: #FFC7B0; /* утро 6:00–10:00, холодно-розовый */
+  --light-day:     #FFF3DE; /* день 10:00–17:00, почти белый */
+  --light-evening: #FFB25E; /* вечер 17:00–24:00, янтарь */
+
+  /* Полоса луча: используется в hero, шкале дня, блоке 3, тарифах, финале */
+  --beam-gradient: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 213, 151, 0.20) 30%,
+      rgba(255, 222, 170, 0.34) 50%,
+      rgba(255, 213, 151, 0.20) 70%,
+      transparent 100%);
+  --beam-angle-morning: -24deg; /* hero, блок 3 */
+  --beam-angle-evening: -12deg; /* тарифы, финал — солнце ниже */
+  --beam-blur: 2px;
+  --beam-blend: screen;
+
+  /* Подложка-затемнение фото в hero (текст по центру читается на любом кадре) */
+  --scrim-hero:
+    radial-gradient(ellipse 58% 62% at 50% 52%, rgba(20,16,13,.84) 0%, rgba(20,16,13,.62) 60%, rgba(20,16,13,.30) 100%),
+    linear-gradient(0deg, rgba(20,16,13,1) 0%, rgba(20,16,13,0) 22%);
+
+  /* ---------- 5. Шрифты ---------- */
+  /* Заменить на "Bebas Neue Pro" одной строкой, когда будет лицензия */
+  --font-display: "Sofia Sans Extra Condensed", "Arial Narrow", "Helvetica Neue Condensed", sans-serif;
+  --font-text: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  --fw-display: 800;      /* заголовки, цифры */
+  --fw-display-soft: 700; /* третья строка оффера, подписи-капс крупные */
+  --fw-text: 400;
+  --fw-text-medium: 500;  /* кнопки, вкладки, вопросы FAQ */
+  --fw-text-bold: 700;    /* только цены в строках и важное в тексте */
+
+  /* ---------- 6. Шкала размеров (1440px, html = 16px) ---------- */
+  /* Display — Sofia Sans Extra Condensed, всегда UPPERCASE */
+  --fs-hero-num:  13rem;    /* 208px — «6–10 СМ» */
+  --fs-display-xl: 7.5rem;  /* 120px — цифры результатов, «14» гарантии, контурное время в блоке 2 (×2 = 240px, см. ниже) */
+  --fs-display-l: 6rem;     /* 96px — строки оффера, заголовок финала */
+  --fs-h2:        4.5rem;   /* 72px — заголовки блоков */
+  --fs-h3:        3.5rem;   /* 56px — этапы 8 недель, третья строка оффера, цены тарифов */
+  --fs-h4:        2.5rem;   /* 40px — названия тарифов, вопрос квиза */
+  --fs-h5:        2rem;     /* 32px — номера пунктов, мелкие display-подписи */
+  --fs-clock:     15rem;    /* 240px — контурное «7:15» */
+  /* Text — Helvetica Neue */
+  --fs-lead:  1.375rem;  /* 22px — подзаголовки блоков, вопросы FAQ */
+  --fs-body-l: 1.125rem; /* 18px — основной текст на тёмном */
+  --fs-body:  1rem;      /* 16px — описания, поля, списки в карточках */
+  --fs-small: 0.875rem;  /* 14px — подписи, сноски, мета */
+  --fs-micro: 0.75rem;   /* 12px — капс-метки с разрядкой (надзаголовки, «До», «После») */
+  --fs-button-l: 1.0625rem; /* 17px */
+  --fs-button-m: 1rem;      /* 16px */
+
+  --lh-display-tight: 0.86; /* hero-цифра, контурное время */
+  --lh-display: 0.92;       /* H1–H3 */
+  --lh-heading-text: 1.3;   /* вопросы FAQ, названия пунктов */
+  --lh-text: 1.55;          /* основной текст */
+  --lh-small: 1.45;
+
+  --ls-display: 0.005em;
+  --ls-caps: 0.12em;        /* капс-метки Helvetica 12–14px */
+  --ls-text: 0;
+
+  --measure: 64ch;          /* максимальная длина строки текста */
+
+  /* ---------- 7. Сетка и отступы (кратно 8) ---------- */
+  --container: 1312px;      /* 1440 − 2 × 64 */
+  --page-margin: 64px;
+  --grid-columns: 12;
+  --gutter: 24px;           /* колонка = 87.33px */
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-10: 80px;
+  --space-12: 96px;
+  --space-16: 128px;
+  --space-20: 160px;   /* вертикальный отступ блока сверху и снизу */
+  --space-25: 200px;
+
+  --header-h: 72px;
+  --section-pad: var(--space-20);
+
+  /* ---------- 8. Скругления (разные по ролям, не одинаковые везде) ---------- */
+  --radius-xs: 4px;      /* таймкоды, теги тарифов внутри списков, «острый угол» кнопки */
+  --radius-s: 8px;       /* поля ввода, ячейки таймера */
+  --radius-m: 14px;      /* кнопки (+ один острый угол, см. ниже), варианты квиза */
+  --radius-l: 24px;      /* карточки тарифов, слайдер, квиз, модалки */
+  --radius-phone: 44px;  /* макет телефона */
+  --radius-pill: 999px;  /* плашки, вкладки, чипы */
+  /* Фирменная форма кнопки: «луч» уходит в нижний левый угол */
+  --radius-button: 14px 14px 14px 4px;
+  --radius-bubble-in: 18px 18px 18px 4px;  /* сообщение куратора */
+  --radius-bubble-out: 18px 18px 4px 18px; /* сообщение ученицы */
+
+  /* ---------- 9. Линии ---------- */
+  --line-hair: 1px;      /* разделители списков, шкала дня, рамки плашек */
+  --line-ui: 1.5px;      /* рамки вторичных кнопок, полей */
+  --line-strong: 2px;    /* активная вкладка меню, ручка слайдера, фокус */
+  --line-beam: 3px;      /* прогресс квиза, прогресс 8 недель */
+  --focus-ring: 2px solid var(--color-ray);
+  --focus-ring-light: 2px solid var(--color-ember);
+  --focus-offset: 3px;
+
+  /* ---------- 10. Тени (только там, где есть «свет») ---------- */
+  --shadow-none: none;
+  /* отсвет главной кнопки при hover — тёплый, без неона */
+  --shadow-dawn: 0 16px 40px -16px rgba(255, 159, 74, 0.45);
+  /* предмет на светлом фоне: макет телефона, слайдер, пузыри */
+  --shadow-paper: 0 1px 0 rgba(20, 16, 13, 0.06), 0 32px 64px -32px rgba(20, 16, 13, 0.35);
+  /* «освещённая» карточка тарифа на тёмном */
+  --shadow-lit: 0 40px 80px -40px rgba(255, 178, 94, 0.35);
+  /* модалки и квиз */
+  --shadow-modal: 0 40px 120px rgba(0, 0, 0, 0.55);
+  --backdrop: rgba(20, 16, 13, 0.82); /* без blur: glassmorphism не используем */
+
+  /* ---------- 11. Слои ---------- */
+  --z-beams: 1;
+  --z-content: 2;
+  --z-sticky-local: 10;   /* sticky-колонка FAQ */
+  --z-header: 100;
+  --z-tooltip: 200;       /* подписи таймкодов */
+  --z-overlay: 900;       /* подложка квиза/модалки */
+  --z-modal: 1000;
+  --z-toast: 1100;
+
+  /* ---------- 12. Motion ---------- */
+  --dur-instant: 120ms;   /* смена цвета/подчёркивания */
+  --dur-fast: 200ms;      /* hover кнопок, иконки */
+  --dur-base: 320ms;      /* вкладки, аккордеон, поля */
+  --dur-slow: 560ms;      /* перемещение луча на шкале дня, смена кейса */
+  --dur-reveal: 800ms;    /* появление при скролле */
+  --dur-hero: 1400ms;     /* проявление фото первого экрана */
+  --dur-ambient: 14000ms; /* медленный дрейф лучей */
+  --stagger: 80ms;
+
+  --ease-light:   cubic-bezier(0.22, 1, 0.36, 1);   /* основной: быстро стартует, мягко «садится», как свет */
+  --ease-move:    cubic-bezier(0.65, 0, 0.35, 1);   /* перемещения туда-обратно (луч, ручка слайдера) */
+  --ease-press:   cubic-bezier(0.3, 0, 0.2, 1);     /* нажатия */
+  --ease-exit:    cubic-bezier(0.4, 0, 1, 1);       /* уход элементов */
+  --ease-scrub:   linear;                           /* всё, что привязано к скроллу */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant: 0ms;
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+    --dur-reveal: 0ms;
+    --dur-hero: 0ms;
+    --dur-ambient: 0ms;
+    --stagger: 0ms;
+  }
+}
+
+/* Базовые правила, которые разработчик берёт как есть */
+html { font-size: 16px; }
+body {
+  background: var(--color-night);
+  color: var(--color-milk);
+  font-family: var(--font-text);
+  font-size: var(--fs-body-l);
+  line-height: var(--lh-text);
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: lining-nums;
+}
+.t-display {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+.t-caps {
+  font-family: var(--font-text);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-text-medium);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+}
+:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
+.is-light :focus-visible { outline: var(--focus-ring-light); }
