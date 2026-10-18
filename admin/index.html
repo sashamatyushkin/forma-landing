@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>ФОРМА — админка (демо)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sofia+Sans+Extra+Condensed:wght@700;800&amp;display=swap">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="admin.css">
+<!-- Графики: Apache ECharts 5.5.1 (точная версия, jsDelivr) -->
+<script defer src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<script defer src="admin-data.js"></script>
+<script defer src="admin.js"></script>
+</head>
+<body class="adm">
+
+<!-- ================= Левая навигация ================= -->
+<aside class="nav" aria-label="Разделы админки">
+  <a class="nav__logo" href="#analytics" aria-label="ФОРМА, админка">
+    <span class="nav__mark" aria-hidden="true">Ф</span>
+  </a>
+  <nav class="nav__list">
+    <a class="nav__item is-active" href="#analytics" data-view-link="analytics" aria-current="page">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 20V10m6 10V4m6 16v-7m4 7H3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Аналитика</span>
+    </a>
+    <a class="nav__item" href="#prices" data-view-link="prices">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3.5 12.5 12 4h7.5v7.5L11 20a1.5 1.5 0 0 1-2.1 0l-5.4-5.4a1.5 1.5 0 0 1 0-2.1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="15.5" cy="8.5" r="1.6" fill="currentColor"/></svg>
+      <span>Редактор цен</span>
+    </a>
+    <a class="nav__item" href="#content" data-view-link="content">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7m6.5-4.5 3 3L15 22h-3v-3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Редактор контента</span>
+    </a>
+    <a class="nav__item" href="#settings" data-view-link="settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v3m0 13v3M2.5 12h3m13 0h3M5.3 5.3l2.1 2.1m9.2 9.2 2.1 2.1m0-13.4-2.1 2.1m-9.2 9.2-2.1 2.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Настройки</span>
+    </a>
+  </nav>
+  <a class="nav__item nav__item--site" href="../index.html" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M14 4h6v6m0-6-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Сайт</span>
+  </a>
+</aside>
+
+<div class="app">
+  <!-- ================= Шапка ================= -->
+  <header class="top">
+    <div class="top__title">
+      <p class="top__crumb" data-crumb>Аналитика</p>
+      <h1 class="top__name">ФОРМА — поток 2 ноября</h1>
+    </div>
+    <div class="top__meta">
+      <p class="top__live" title="Демо: значение меняется случайно">
+        <span class="top__live-dot" aria-hidden="true"></span>
+        Сейчас на сайте: <strong data-online>37</strong>
+      </p>
+      <p class="top__updated">Обновлено <span data-updated>18.10.2026, 13:30</span></p>
+      <button class="ibtn" type="button" data-refresh aria-label="Обновить данные">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4.5h-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="bell">
+        <button class="ibtn bell__btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="bell-panel" data-bell>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15Zm4 4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="bell__count" data-bell-count>3</span>
+          <span class="sr-only">Уведомления</span>
+        </button>
+        <div class="bell__panel" id="bell-panel" hidden>
+          <div class="bell__head">
+            <p class="bell__title">Уведомления</p>
+            <button class="link-btn" type="button" data-bell-read>Прочитать все</button>
+          </div>
+          <ul class="bell__list" data-bell-list></ul>
+          <p class="bell__note">Демо: уведомления генерируются в браузере</p>
+        </div>
+      </div>
+      <div class="user">
+        <span class="user__avatar" aria-hidden="true">МШ</span>
+        <span class="user__text"><span class="user__name">Менеджер школы</span><span class="user__role">Администратор</span></span>
+      </div>
+    </div>
+  </header>
+
+  <p class="demo-bar" role="note">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v5m0 3v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span><strong>Демо-данные.</strong> В проде — Яндекс.Метрика + CRM. Цифры сгенерированы для показа и не отражают реальные продажи.</span>
+  </p>
+
+  <main class="main">
+
+    <!-- =========================================================
+         1. АНАЛИТИКА
+         ========================================================= -->
+    <section class="view view--analytics is-active" id="view-analytics" data-view="analytics" aria-labelledby="h-analytics">
+      <h2 class="sr-only" id="h-analytics">Аналитика</h2>
+
+      <!-- Слайсеры -->
+      <div class="slicers" role="group" aria-label="Фильтры отчёта">
+        <div class="slicer">
+          <p class="slicer__label" id="sl-period">Период</p>
+          <div class="seg" role="radiogroup" aria-labelledby="sl-period" data-slicer="period">
+            <button type="button" role="radio" aria-checked="false" data-value="7">7 дней</button>
+            <button type="button" role="radio" aria-checked="false" data-value="14">14 дней</button>
+            <button type="button" role="radio" aria-checked="true" data-value="30" class="is-on">30 дней</button>
+          </div>
+        </div>
+        <div class="slicer">
+          <p class="slicer__label" id="sl-source">Источник трафика</p>
+          <div class="seg" role="radiogroup" aria-labelledby="sl-source" data-slicer="source">
+            <button type="button" role="radio" aria-checked="true" data-value="all" class="is-on">Все</button>
+            <button type="button" role="radio" aria-checked="false" data-value="ig">Instagram/Reels</button>
+            <button type="button" role="radio" aria-checked="false" data-value="tg">Telegram Ads</button>
+            <button type="button" role="radio" aria-checked="false" data-value="vk">VK</button>
+            <button type="button" role="radio" aria-checked="false" data-value="org">Органика</button>
+          </div>
+        </div>
+        <div class="slicer">
+          <p class="slicer__label" id="sl-segment">Сегмент</p>
+          <div class="seg" role="radiogroup" aria-labelledby="sl-segment" data-slicer="segment">
+            <button type="button" role="radio" aria-checked="true" data-value="all" class="is-on">Все</button>
+            <button type="button" role="radio" aria-checked="false" data-value="office">Офис</button>
+            <button type="button" role="radio" aria-checked="false" data-value="mom">Мама</button>
+            <button type="button" role="radio" aria-checked="false" data-value="newbie">Новичок</button>
+          </div>
+        </div>
+        <div class="slicers__end">
+          <p class="slicers__range" data-range>19 сен — 18 окт 2026</p>
+          <button class="link-btn" type="button" data-reset-filters hidden>Сбросить фильтры</button>
+        </div>
+      </div>
+
+      <!-- KPI -->
+      <ul class="kpis" data-kpis aria-label="Ключевые метрики"></ul>
+
+      <!-- Визуалы -->
+      <div class="canvas">
+        <article class="vis vis--trend" data-vis>
+          <header class="vis__head">
+            <div>
+              <h3 class="vis__title">Выручка и оплаты по дням</h3>
+              <p class="vis__sub" data-ctx></p>
+            </div>
+            <button class="vis__focus ibtn ibtn--s" type="button" data-focus aria-label="Развернуть визуал">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5m11-5v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </header>
+          <div class="vis__chart" id="ch-trend" role="img" aria-label="Выручка по дням, линия, и оплаты по тарифам, столбцы"></div>
+        </article>
+
+        <article class="vis vis--funnel" data-vis>
+          <header class="vis__head">
+            <div>
+              <h3 class="vis__title">Воронка</h3>
+              <p class="vis__sub">от визита до оплаты, доля от визитов и шаг к шагу</p>
+            </div>
+          </header>
+          <ol class="funnel" data-funnel></ol>
+        </article>
+
+        <article class="vis vis--tariffs" data-vis>
+          <header class="vis__head">
+            <div>
+              <h3 class="vis__title">Продажи по тарифам</h3>
+              <p class="vis__sub" data-tariff-sub>число оплат</p>
+            </div>
+            <div class="mini-seg" role="radiogroup" aria-label="Мера" data-tariff-measure>
+              <button type="button" role="radio" aria-checked="true" class="is-on" data-value="count">Оплаты</button>
+              <button type="button" role="radio" aria-checked="false" data-value="revenue">Выручка</button>
+            </div>
+          </header>
+          <div class="vis__chart" id="ch-tariffs" role="img" aria-label="Продажи по тарифам, столбцы"></div>
+        </article>
+
+        <article class="vis vis--sources" data-vis>
+          <header class="vis__head">
+            <div>
+              <h3 class="vis__title">Источники трафика</h3>
+              <p class="vis__sub">визиты, клик по сектору фильтрует отчёт</p>
+            </div>
+          </header>
+          <div class="vis__chart" id="ch-sources" role="img" aria-label="Доли источников трафика, кольцевая диаграмма"></div>
+        </article>
+
+        <article class="vis vis--segments" data-vis>
+          <header class="vis__head">
+            <div>
+              <h3 class="vis__title">Конверсия по сегментам</h3>
+              <p class="vis__sub">клик по сегменту фильтрует отчёт</p>
+            </div>
+          </header>
+          <div class="vis__chart" id="ch-segments" role="img" aria-label="Конверсия по сегментам, столбцы"></div>
+        </article>
+
+        <article class="vis vis--table" data-vis>
+          <header class="vis__head">
+            <div>
+              <h3 class="vis__title">Кампании (UTM)</h3>
+              <p class="vis__sub">клик по заголовку столбца сортирует таблицу</p>
+            </div>
+            <button class="btn btn--ghost btn--s" type="button" data-export>
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Экспорт CSV
+            </button>
+          </header>
+          <div class="table-wrap">
+            <table class="tbl" data-campaigns>
+              <thead>
+                <tr>
+                  <th scope="col" data-sort="label" aria-sort="none"><button type="button">Кампания</button></th>
+                  <th scope="col" data-sort="sourceName" aria-sort="none"><button type="button">Источник</button></th>
+                  <th scope="col" class="num" data-sort="impr" aria-sort="none"><button type="button">Показы</button></th>
+                  <th scope="col" class="num" data-sort="clicks" aria-sort="none"><button type="button">Клики</button></th>
+                  <th scope="col" class="num" data-sort="visits" aria-sort="none"><button type="button">Визиты</button></th>
+                  <th scope="col" class="num" data-sort="pays" aria-sort="none"><button type="button">Оплаты</button></th>
+                  <th scope="col" class="num" data-sort="revenue" aria-sort="descending"><button type="button">Выручка</button></th>
+                  <th scope="col" class="num" data-sort="spend" aria-sort="none"><button type="button">Расход</button></th>
+                  <th scope="col" class="num" data-sort="romi" aria-sort="none"><button type="button">ROMI</button></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+              <tfoot></tfoot>
+            </table>
+          </div>
+        </article>
+
+        <article class="vis vis--heat" data-vis>
+          <header class="vis__head">
+            <div>
+              <h3 class="vis__title">Активность по часам и дням недели</h3>
+              <p class="vis__sub">визиты, московское время</p>
+            </div>
+          </header>
+          <div class="vis__chart" id="ch-heat" role="img" aria-label="Тепловая карта визитов по часам и дням недели"></div>
+        </article>
+
+        <article class="vis vis--feed" data-vis>
+          <header class="vis__head">
+            <div>
+              <h3 class="vis__title">Лента событий</h3>
+              <p class="vis__sub">демо: события появляются в реальном времени</p>
+            </div>
+            <span class="pulse" aria-hidden="true"></span>
+          </header>
+          <ul class="feed" data-feed aria-live="polite"></ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         2. РЕДАКТОР ЦЕН
+         ========================================================= -->
+    <section class="view view--prices" id="view-prices" data-view="prices" aria-labelledby="h-prices" hidden>
+      <div class="view__head">
+        <div>
+          <h2 class="view__title" id="h-prices">Редактор цен</h2>
+          <p class="view__lead">Ранняя цена действует до 27.10 включительно, с 28.10 — обычная. После публикации цены сразу видны на сайте: карточки тарифов, «в день», «долями», кнопки оплаты и квиз.</p>
+        </div>
+        <p class="status" data-price-status><span class="status__dot"></span><span data-price-status-text>Опубликовано</span></p>
+      </div>
+
+      <div class="prices">
+        <div class="prices__editors" data-price-editors></div>
+
+        <aside class="prices__side" aria-label="Превью и публикация">
+          <div class="panel">
+            <p class="panel__title">Что изменится на сайте</p>
+            <ul class="diff" data-diff></ul>
+            <div class="panel__actions">
+              <button class="btn btn--primary" type="button" data-publish-prices>Опубликовать</button>
+              <button class="btn btn--ghost" type="button" data-reset-prices>Сбросить к исходным</button>
+            </div>
+            <a class="link" href="../index.html#tarify" target="_blank" rel="noopener">Открыть тарифы на сайте</a>
+          </div>
+          <div class="panel">
+            <div class="panel__head">
+              <p class="panel__title">Превью на сайте</p>
+              <div class="mini-seg" role="radiogroup" aria-label="Период цен" data-preview-phase>
+                <button type="button" role="radio" aria-checked="true" class="is-on" data-value="early">До 28.10</button>
+                <button type="button" role="radio" aria-checked="false" data-value="regular">С 28.10</button>
+              </div>
+            </div>
+            <div class="mini-seg mini-seg--wide" role="tablist" aria-label="Тариф для превью" data-preview-tabs>
+              <button type="button" role="tab" aria-selected="false" data-value="sama">Сама</button>
+              <button type="button" role="tab" aria-selected="true" class="is-on" data-value="kurator">С куратором</button>
+              <button type="button" role="tab" aria-selected="false" data-value="lichnoe">Личное ведение</button>
+            </div>
+            <div class="preview-stage">
+              <div class="pv" data-preview aria-live="polite"></div>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         3. РЕДАКТОР КОНТЕНТА
+         ========================================================= -->
+    <section class="view view--content" id="view-content" data-view="content" aria-labelledby="h-content" hidden>
+      <div class="view__head">
+        <div>
+          <h2 class="view__title" id="h-content">Редактор контента</h2>
+          <p class="view__lead">Выбери блок, поправь тексты и посмотри результат справа. В демо на сайт уходят заголовок и главная кнопка первого экрана, остальные блоки сохраняются в админке.</p>
+        </div>
+      </div>
+
+      <div class="content">
+        <nav class="blocks" aria-label="Блоки сайта">
+          <ol class="blocks__list" data-blocks></ol>
+        </nav>
+
+        <div class="editor">
+          <div class="editor__head">
+            <div>
+              <p class="editor__crumb" data-editor-anchor>#top</p>
+              <h3 class="editor__title" data-editor-title>Первый экран</h3>
+            </div>
+            <p class="status" data-content-status><span class="status__dot"></span><span data-content-status-text>Опубликовано</span></p>
+          </div>
+          <form class="editor__form" data-editor-form novalidate></form>
+          <div class="editor__actions">
+            <button class="btn btn--primary" type="button" data-content-publish>Опубликовать</button>
+            <button class="btn btn--ghost" type="button" data-content-revert>Отменить изменения</button>
+            <p class="editor__note" data-editor-note></p>
+          </div>
+          <div class="history">
+            <p class="panel__title">История изменений</p>
+            <ol class="history__list" data-history></ol>
+          </div>
+        </div>
+
+        <aside class="wys" aria-label="Превью блока">
+          <div class="wys__bar">
+            <span class="wys__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="wys__url" data-wys-url>forma-fit.ru/#top</span>
+          </div>
+          <div class="wys__frame" data-wys></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         4. НАСТРОЙКИ
+         ========================================================= -->
+    <section class="view view--settings" id="view-settings" data-view="settings" aria-labelledby="h-settings" hidden>
+      <div class="view__head">
+        <div>
+          <h2 class="view__title" id="h-settings">Настройки</h2>
+          <p class="view__lead">Поля-заглушки: в демо значения хранятся только в этом браузере и никуда не отправляются.</p>
+        </div>
+      </div>
+      <form class="settings" data-settings novalidate>
+        <div class="field">
+          <label class="field__label" for="set-metrika">ID счётчика Яндекс.Метрики</label>
+          <input class="field__input" id="set-metrika" name="metrika" inputmode="numeric" placeholder="например, 12345678" autocomplete="off">
+          <p class="field__hint">Подставится в CONFIG.analytics.metrikaId в main.js</p>
+        </div>
+        <div class="field">
+          <label class="field__label" for="set-bot">Ссылка на Telegram-бота</label>
+          <input class="field__input" id="set-bot" name="bot" placeholder="https://t.me/forma_bot" autocomplete="off">
+          <p class="field__hint">Марафон «Плоский живот дома» и кнопки «3 бесплатных дня»</p>
+        </div>
+        <div class="field">
+          <label class="field__label" for="set-pay">Endpoint оплаты</label>
+          <input class="field__input" id="set-pay" name="pay" placeholder="https://…/payments/create" autocomplete="off">
+          <p class="field__hint">Куда форма оплаты отправляет заказ (ЮKassa, CloudPayments, Prodamus или своя CRM)</p>
+        </div>
+        <div class="settings__actions">
+          <button class="btn btn--primary" type="submit">Сохранить</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</div>
+
+<!-- Тосты -->
+<div class="toasts" data-toasts aria-live="polite" aria-atomic="false"></div>
+
+<noscript><p class="nojs">Админка работает с включённым JavaScript.</p></noscript>
+</body>
+</html>
