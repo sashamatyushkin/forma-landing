@@ -547,6 +547,15 @@ html:not(.js) .panel + .panel { margin-top: 80px; }
 .weeks__dates { margin-top: 10px; font-size: var(--fs-small); font-weight: var(--fw-text-medium); color: var(--n-300); }
 .weeks__text { margin-top: 10px; max-width: 34ch; font-size: var(--fs-body); line-height: var(--lh-text); color: var(--n-300); }
 
+/* результаты недель — статичный список под этапом (без JS, reduced-motion); в режиме пина скрыт визуально, читается скринридером */
+.weeks__results { display: grid; gap: 14px; max-width: 34ch; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--color-hair-dark); }
+.weeks__res-num { display: block; font-size: var(--fs-micro); font-weight: var(--fw-text-medium); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--color-ray); }
+.weeks__res-text { display: block; margin-top: 4px; font-size: var(--fs-body); line-height: var(--lh-text); color: var(--color-milk); }
+.weeks--pin .weeks__results {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
 /* линия прогресса 8 недель: деления совпадают с колонками (2 недели = 1 колонка) */
 .weeks__track { margin-top: 40px; padding-bottom: 8px; }
 .weeks__bar { position: relative; height: var(--line-beam); background: var(--n-800); }
@@ -554,6 +563,21 @@ html:not(.js) .panel + .panel { margin-top: 80px; }
 .weeks__ticks { position: absolute; inset: -5px 0 auto; height: 13px; display: flex; justify-content: space-between; }
 .weeks__tick { width: 1px; height: 13px; background: rgba(205, 191, 173, 0.45); }
 .weeks__tick:nth-child(odd) { height: 17px; margin-top: -2px; background: rgba(205, 191, 173, 0.75); }
+.weeks__bar .weeks__now {
+  position: absolute; top: -3px; left: 0; width: 12.5%; height: 8px; border-radius: 4px;
+  background: var(--color-ray-hi); box-shadow: 0 0 18px rgba(255, 213, 151, 0.85);
+  opacity: 0; transform: translateX(calc(var(--w, 7) * 100%));
+  transition: transform var(--dur-base) var(--ease-light), opacity var(--dur-base) var(--ease-light);
+}
+.weeks--pin .weeks__now { opacity: 1; }
+.weeks__wnums { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); margin-bottom: 10px; }
+.weeks__wnum {
+  font-size: var(--fs-small); font-weight: var(--fw-text-medium); font-variant-numeric: tabular-nums; text-align: center; color: var(--color-ray);
+  opacity: 0.7;
+}
+.weeks--pin .weeks__wnum { opacity: 0.35; transition: opacity var(--dur-base) var(--ease-light), transform var(--dur-base) var(--ease-light); }
+.weeks--pin .weeks__wnum.is-past { opacity: 0.6; }
+.weeks--pin .weeks__wnum.is-active { opacity: 1; transform: scale(1.35); }
 .weeks__ends { display: flex; justify-content: space-between; margin-top: 14px; font-size: var(--fs-small); font-weight: var(--fw-text-medium); color: var(--n-300); }
 
 /* солнце — широкая наклонная полоса света */
@@ -565,22 +589,45 @@ html:not(.js) .panel + .panel { margin-top: 80px; }
 }
 .weeks__trail { position: absolute; z-index: 0; inset: 0; background: linear-gradient(90deg, rgba(255, 213, 151, 0.02), rgba(255, 213, 151, 0.07) 70%, rgba(255, 213, 151, 0)); transform-origin: left center; pointer-events: none; }
 .weeks__milk { position: absolute; z-index: 4; inset: -2px; background: var(--color-milk); pointer-events: none; }
-.weeks__counter { display: flex; align-items: flex-end; gap: 16px; pointer-events: none; }
-.weeks__counter-label { padding-bottom: 14px; font-size: var(--fs-micro); font-weight: var(--fw-text-medium); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--color-ray); }
-.weeks__counter-num { position: relative; display: block; min-width: 0.6em; font-family: var(--font-display); font-weight: var(--fw-display); font-size: 120px; line-height: 0.8; font-variant-numeric: tabular-nums; text-align: right; }
+/* карточка «Результат недели» (создаёт animations.js в режиме пина): счётчик недели + результат */
+.weeks__result {
+  display: flex; align-items: stretch; gap: 28px; flex: 0 1 640px; min-width: 0;
+  padding: 22px 28px 24px; border: 1px solid var(--color-hair-dark); border-radius: var(--radius-l);
+  background: rgba(20, 16, 13, 0.62); pointer-events: none;
+}
+.weeks__result-body { flex: 1 1 auto; min-width: 0; padding-left: 28px; border-left: 1px solid var(--color-hair-dark); }
+.weeks__result-label { display: block; font-size: var(--fs-micro); font-weight: var(--fw-text-medium); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--color-ray); }
+.weeks__result-text { min-height: 4.2em; margin-top: 14px; font-size: 1.25rem; line-height: 1.4; color: var(--color-milk); text-wrap: pretty; }
+.weeks__counter { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; flex: none; pointer-events: none; }
+.weeks__counter-label { font-size: var(--fs-micro); font-weight: var(--fw-text-medium); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--color-ray); }
+.weeks__counter-num { position: relative; display: block; min-width: 0.62em; font-family: var(--font-display); font-weight: var(--fw-display); font-size: 120px; line-height: 0.8; font-variant-numeric: tabular-nums; text-align: right; }
 .weeks__counter-num span { display: block; }
 .weeks__counter-stroke { color: transparent; -webkit-text-stroke: 1px rgba(255, 213, 151, 0.75); }
 .weeks__counter-fill { position: absolute; inset: 0; color: var(--color-ray); opacity: 0; transition: opacity var(--dur-base) var(--ease-light); }
 .weeks__counter.is-done .weeks__counter-fill { opacity: 1; }
 
-/* финиш (статичная версия — светлая полоса под этапами) */
+/* финиш (статичная версия — светлая панель под этапами) на фоне фото выпускниц:
+   лица в верхней половине кадра, текст — внизу по центру на высветлении молоком.
+   Тёплая обработка: sepia + наклонный луч. Высветление к низу (стык со светлым «Что внутри»).
+   Высветление считается от низа в px: нижние 400px (весь текстовый блок) — молоко ≥ 0.92 при любой высоте панели.
+   Контраст даже над чёрным пикселем фото: ink ≥ 13:1, bark ≥ 7:1, ember ≥ 4.8:1 */
 .weeks__finish {
-  position: relative; z-index: 5;
-  display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; column-gap: 24px;
-  margin-top: 80px; padding: 96px var(--page-margin) 0;
+  position: relative; z-index: 5; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+  min-height: 820px; margin-top: 80px; padding: 120px var(--page-margin) 96px;
   background: var(--color-milk); color: var(--color-bark);
   font-size: var(--fs-lead); line-height: 1.45; text-align: center;
 }
+.weeks__finish-media { position: absolute; z-index: -2; inset: 0; display: block; }
+.weeks__finish-media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; filter: sepia(0.3) saturate(0.95) brightness(1.06) contrast(0.92); }
+.weeks__finish::before {
+  content: ""; position: absolute; z-index: -1; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(0deg, var(--color-milk) 0, rgba(245, 235, 221, 0.93) 200px, rgba(245, 235, 221, 0.92) 400px, rgba(245, 235, 221, 0.6) 470px, rgba(245, 235, 221, 0.2) 560px, rgba(245, 235, 221, 0.14) 100%),
+    linear-gradient(104deg, rgba(255, 226, 180, 0) 18%, rgba(255, 226, 180, 0.28) 30%, rgba(255, 226, 180, 0) 44%);
+}
+.weeks__finish-body { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; column-gap: 24px; max-width: 1100px; }
+.weeks__finish-actions { margin-top: 40px; }
 .weeks__finish-label { flex-basis: 100%; margin-bottom: 16px; font-size: var(--fs-micro); font-weight: var(--fw-text-medium); letter-spacing: var(--ls-caps); text-transform: uppercase; color: var(--color-ember); }
 .weeks__finish time { font-family: var(--font-display); font-weight: var(--fw-display); font-size: var(--fs-display-xl); line-height: var(--lh-display-tight); text-transform: uppercase; color: var(--color-ink); }
 
@@ -589,7 +636,8 @@ html:not(.js) .panel + .panel { margin-top: 80px; }
 .weeks--pin .weeks__inner { padding-top: var(--header-h); }
 .weeks--pin .weeks__sun { transform: none; will-change: transform, opacity; }
 @media (max-height: 820px) { .weeks--pin .weeks__img { display: none; } }
-.weeks--pin .weeks__finish { position: absolute; inset: 0; margin: 0; padding: var(--header-h) var(--page-margin) 0; align-content: center; background: transparent; }
+.weeks--pin .weeks__finish { position: absolute; inset: 0; min-height: 0; margin: 0; padding: var(--header-h) var(--page-margin) clamp(48px, 8vh, 96px); background: transparent; }
+.weeks--pin .weeks__finish-media { will-change: transform; }
 
 /* Что внутри: модули-карточки и «Результат для тебя» (светлая часть) */
 .program__light { position: relative; margin-top: -2px; padding: var(--space-12) 0 var(--space-10); background: var(--color-milk); color: var(--color-ink); }

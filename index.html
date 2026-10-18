@@ -42,6 +42,7 @@
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="bottom.css">
+<link rel="stylesheet" href="inside.css">
 <link rel="stylesheet" href="features.css">
 
 <!-- Скрипты: всё с defer, порядок выполнения сохраняется -->
@@ -51,6 +52,7 @@
 <script defer src="animations.js"></script>
 <script defer src="features.js"></script>
 <script defer src="bottom.js"></script>
+<script src="admin-bridge.js" defer></script>
 
 <!-- Микроразметка: организация, курс, FAQ -->
 <script type="application/ld+json">
@@ -518,28 +520,52 @@
             <h3 class="weeks__title"><span class="weeks__num">Недели 1–2</span> <span class="weeks__name">Знакомство</span></h3>
             <p class="weeks__dates">2–15 ноября</p>
             <p class="weeks__text">Ставим технику. 3 тренировки по 30 минут. Стартовые замеры.</p>
+            <!-- Результаты недель: без JS и при reduced-motion видны списком; в режиме пина animations.js показывает их по одной в карточке «Результат недели» -->
+            <ul class="weeks__results" aria-label="Результат недель 1–2">
+              <li class="weeks__res" data-week="1"><span class="weeks__res-num">Неделя 1</span> <span class="weeks__res-text">Освоила технику базовых упражнений. Стартовые замеры записаны в трекер</span></li>
+              <li class="weeks__res" data-week="2"><span class="weeks__res-num">Неделя 2</span> <span class="weeks__res-text">Три тренировки в неделю уже не через силу. Вечером меньше тянет на сладкое</span></li>
+            </ul>
           </li>
           <li class="weeks__stage" data-stage="2">
             <picture class="weeks__img"><source type="image/webp" srcset="assets/img/v3/stage-2-bands.webp"><img src="assets/img/v3/stage-2-bands.jpg" width="800" height="1200" alt="Тренировка с резинкой" loading="lazy" decoding="async"></picture>
             <h3 class="weeks__title"><span class="weeks__num">Недели 3–4</span> <span class="weeks__name">Ритм</span></h3>
             <p class="weeks__dates">16–29 ноября</p>
             <p class="weeks__text">4 тренировки в неделю, добавляем резинки. Первая сверка замеров.</p>
+            <ul class="weeks__results" aria-label="Результат недель 3–4">
+              <li class="weeks__res" data-week="3"><span class="weeks__res-num">Неделя 3</span> <span class="weeks__res-text">Тренировка встала в расписание. С резинками мышцы чувствуются по-новому</span></li>
+              <li class="weeks__res" data-week="4"><span class="weeks__res-num">Неделя 4</span> <span class="weeks__res-text">Первая сверка замеров: у многих уходят первые сантиметры в талии. Одежда сидит свободнее</span></li>
+            </ul>
           </li>
           <li class="weeks__stage" data-stage="3">
             <picture class="weeks__img"><source type="image/webp" srcset="assets/img/v3/stage-3-dumbbells.webp"><img src="assets/img/v3/stage-3-dumbbells.jpg" width="800" height="533" alt="Тренировка с гантелями" loading="lazy" decoding="async"></picture>
             <h3 class="weeks__title"><span class="weeks__num">Недели 5–6</span> <span class="weeks__name">Сила</span></h3>
             <p class="weeks__dates">30 ноября – 13 декабря</p>
             <p class="weeks__text">Гантели и рост нагрузки. Эфир о том, что делать, если вес встал.</p>
+            <ul class="weeks__results" aria-label="Результат недель 5–6">
+              <li class="weeks__res" data-week="5"><span class="weeks__res-num">Неделя 5</span> <span class="weeks__res-text">Гантели в руках, и ты держишь технику. Сил к вечеру больше</span></li>
+              <li class="weeks__res" data-week="6"><span class="weeks__res-num">Неделя 6</span> <span class="weeks__res-text">Половина пути позади. Если вес встал, разбираем это на эфире, а сантиметры продолжают уходить</span></li>
+            </ul>
           </li>
           <li class="weeks__stage" data-stage="4">
             <picture class="weeks__img"><source type="image/webp" srcset="assets/img/v3/stage-4-finish.webp"><img src="assets/img/v3/stage-4-finish.jpg" width="800" height="1200" alt="Финиш программы" loading="lazy" decoding="async"></picture>
             <h3 class="weeks__title"><span class="weeks__num">Недели 7–8</span> <span class="weeks__name">Форма</span></h3>
             <p class="weeks__dates">14–27 декабря</p>
             <p class="weeks__text">Итоговые замеры. План, как сохранить результат в праздники.</p>
+            <ul class="weeks__results" aria-label="Результат недель 7–8">
+              <li class="weeks__res" data-week="7"><span class="weeks__res-num">Неделя 7</span> <span class="weeks__res-text">Привычка закрепилась: 3–&#8288;4&nbsp;тренировки в неделю без напоминаний</span></li>
+              <li class="weeks__res" data-week="8"><span class="weeks__res-num">Неделя 8</span> <span class="weeks__res-text">Итоговые замеры: в среднем −4–&#8288;7&nbsp;кг и −6–&#8288;10&nbsp;см в&nbsp;талии. И план, как сохранить результат в праздники</span></li>
+            </ul>
           </li>
         </ol>
       </div>
-      <p class="weeks__finish"><span class="weeks__finish-label">Финиш</span> <time datetime="2026-12-27">27 декабря</time> <span class="weeks__finish-text">За 4 дня до Нового года</span></p>
+      <div class="weeks__finish">
+        <!-- ФОТО: счастливые выпускницы программы (3–5 женщин 30–45 лет дома или в светлой студии, смеются, в спортивной одежде, тёплый дневной свет); горизонталь от 1920×1280. Сейчас демо-фото из assets/img/v4 — заменить на реальное фото выпускниц с их согласия -->
+        <picture class="weeks__finish-media" aria-hidden="true"><source type="image/webp" srcset="assets/img/v4/finish-graduates.webp"><img src="assets/img/v4/finish-graduates.jpg" width="2000" height="1333" alt="" loading="lazy" decoding="async"></picture>
+        <p class="weeks__finish-body"><span class="weeks__finish-label">Финиш</span> <time datetime="2026-12-27">27 декабря</time> <span class="weeks__finish-text">За 4 дня до Нового года</span></p>
+        <div class="weeks__finish-actions">
+          <a class="btn btn--primary btn--l" href="#tarify" data-goal="weeks_finish_cta">Начать 2 ноября</a>
+        </div>
+      </div>
     </div>
 
     <!-- Что внутри: модули и результат для тебя (светлая часть) -->
@@ -551,62 +577,117 @@
             <p class="inside__sub">И что это даёт тебе</p>
           </header>
           <ul class="inside__grid">
-          <li class="inside__card inside__card--wide inside__card--time">
-            <span class="inside__art" aria-hidden="true"></span>
-            <p class="inside__num" aria-hidden="true">01</p>
-            <h4 class="inside__name">Тренировки дома по&nbsp;<span class="nobr">30–40 минут</span></h4>
-            <p class="inside__what">Без инвентаря или с резинками и гантелями.</p>
-            <div class="inside__result">
-              <p class="inside__result-label">Результат для тебя</p>
-              <p class="inside__result-text">Тренировка встаёт в твой день без дороги в зал. К 8-й неделе 3–4 занятия в неделю становятся привычкой.</p>
+          <li class="inside__card inside__card--wide inside__card--time inside__card--side">
+            <!-- ФОТО: тренировка дома на коврике, без зала; горизонталь 4:3, 1600 px (сейчас демо из v4) -->
+            <div class="inside__media">
+              <picture class="inside__pic">
+                <source type="image/webp" srcset="assets/img/v4/inside-1-workout.webp">
+                <img src="assets/img/v4/inside-1-workout.jpg" width="800" height="600" loading="lazy" decoding="async" alt="Тренировка дома на коврике: упражнение без зала и сложного инвентаря">
+              </picture>
+              <p class="inside__num" aria-hidden="true">01</p>
             </div>
-            <span class="inside__tag tag">во всех тарифах</span>
+            <div class="inside__body">
+              <h4 class="inside__name">Тренировки дома по&nbsp;<span class="nobr">30–40 минут</span></h4>
+              <p class="inside__what">Без инвентаря или с резинками и гантелями.</p>
+              <div class="inside__result">
+                <p class="inside__result-label">Результат для тебя</p>
+                <p class="inside__result-text">Тренировка встаёт в твой день без дороги в зал. К 8-й неделе 3–4 занятия в неделю становятся привычкой.</p>
+              </div>
+              <span class="inside__tag tag">во всех тарифах</span>
+            </div>
           </li>
-          <li class="inside__card">
-            <span class="inside__art" aria-hidden="true"></span>
-            <p class="inside__num" aria-hidden="true">02</p>
-            <h4 class="inside__name">Питание без жёстких запретов</h4>
-            <p class="inside__what">Обычные продукты, любимую еду не вычёркиваем.</p>
-            <div class="inside__result">
-              <p class="inside__result-label">Результат для тебя</p>
-              <p class="inside__result-text">Ешь привычную еду и не срываешься: когда нет запретов, не с чего срываться.</p>
+          <li class="inside__card inside__card--food">
+            <!-- ФОТО: обычная домашняя еда, тарелка на столе при дневном свете; горизонталь 4:3, 1600 px -->
+            <div class="inside__media">
+              <picture class="inside__pic">
+                <source type="image/webp" srcset="assets/img/v4/inside-2-food.webp">
+                <img src="assets/img/v4/inside-2-food.jpg" width="800" height="600" loading="lazy" decoding="async" alt="Обычная домашняя еда на тарелке — без жёстких запретов и диетических продуктов">
+              </picture>
+              <p class="inside__num" aria-hidden="true">02</p>
             </div>
-            <span class="inside__tag tag">во всех тарифах</span>
+            <div class="inside__body">
+              <h4 class="inside__name">Питание без жёстких запретов</h4>
+              <p class="inside__what">Обычные продукты, любимую еду не вычёркиваем.</p>
+              <div class="inside__result">
+                <p class="inside__result-label">Результат для тебя</p>
+                <p class="inside__result-text">Ешь привычную еду и не срываешься: когда нет запретов, не с чего срываться.</p>
+              </div>
+              <span class="inside__tag tag">во всех тарифах</span>
+            </div>
           </li>
           <li class="inside__card inside__card--track">
-            <span class="inside__art" aria-hidden="true"></span>
-            <p class="inside__num" aria-hidden="true">03</p>
-            <h4 class="inside__name">Трекер прогресса</h4>
-            <p class="inside__what">Видно, как ты меняешься, даже когда весы стоят.</p>
-            <div class="inside__result">
-              <p class="inside__result-label">Результат для тебя</p>
-              <p class="inside__result-text">Видишь сантиметры и силу, даже когда весы стоят. Меньше поводов бросить на третьей неделе.</p>
+            <!-- ФОТО: замер талии сантиметровой лентой / отметка в трекере; горизонталь 4:3, 1600 px -->
+            <div class="inside__media">
+              <picture class="inside__pic">
+                <source type="image/webp" srcset="assets/img/v4/inside-3-tracker.webp">
+                <img src="assets/img/v4/inside-3-tracker.jpg" width="800" height="600" loading="lazy" decoding="async" alt="Замер сантиметровой лентой: прогресс видно в сантиметрах, даже когда весы стоят">
+              </picture>
+              <span class="inside__art" aria-hidden="true"></span>
+              <p class="inside__num" aria-hidden="true">03</p>
             </div>
-            <span class="inside__tag tag">во всех тарифах</span>
+            <div class="inside__body">
+              <h4 class="inside__name">Трекер прогресса</h4>
+              <p class="inside__what">Видно, как ты меняешься, даже когда весы стоят.</p>
+              <div class="inside__result">
+                <p class="inside__result-label">Результат для тебя</p>
+                <p class="inside__result-text">Видишь сантиметры и силу, даже когда весы стоят. Меньше поводов бросить на третьей неделе.</p>
+              </div>
+              <span class="inside__tag tag">во всех тарифах</span>
+            </div>
           </li>
-          <li class="inside__card inside__card--wide inside__card--chat">
-            <span class="inside__art" aria-hidden="true"></span>
-            <p class="inside__num" aria-hidden="true">04</p>
-            <h4 class="inside__name">Чат с кураторами</h4>
-            <p class="inside__what">Живые люди отвечают на «а так нормально?».</p>
-            <div class="inside__result">
-              <p class="inside__result-label">Результат для тебя</p>
-              <p class="inside__result-text">Ты не одна: на вопрос «а так нормально?» отвечают живые люди, а не комментарии под видео.</p>
+          <li class="inside__card inside__card--wide inside__card--chat inside__card--side inside__card--side-end">
+            <!-- ФОТО: девушка дома переписывается в телефоне (чат с куратором); горизонталь 4:3, 1600 px -->
+            <div class="inside__media">
+              <picture class="inside__pic">
+                <source type="image/webp" srcset="assets/img/v4/inside-4-chat.webp">
+                <img src="assets/img/v4/inside-4-chat.jpg" width="800" height="600" loading="lazy" decoding="async" alt="Девушка дома пишет в чат с телефона — на вопросы отвечают живые кураторы">
+              </picture>
+              <span class="inside__art" aria-hidden="true"></span>
+              <p class="inside__num" aria-hidden="true">04</p>
             </div>
-            <span class="inside__tag tag tag--accent">«С куратором» и выше</span>
+            <div class="inside__body">
+              <h4 class="inside__name">Чат с кураторами</h4>
+              <p class="inside__what">Живые люди отвечают на «а так нормально?».</p>
+              <div class="inside__result">
+                <p class="inside__result-label">Результат для тебя</p>
+                <p class="inside__result-text">Ты не одна: на вопрос «а так нормально?» отвечают живые люди, а не комментарии под видео.</p>
+              </div>
+              <span class="inside__tag tag tag--accent">«С куратором» и выше</span>
+            </div>
           </li>
           <li class="inside__card inside__card--live">
-            <span class="inside__art" aria-hidden="true"></span>
-            <p class="inside__num" aria-hidden="true">05</p>
-            <h4 class="inside__name">Прямые эфиры с Анной</h4>
-            <p class="inside__what">Вопросы, разборы, поддержка в середине пути.</p>
-            <div class="inside__result">
-              <p class="inside__result-label">Результат для тебя</p>
-              <p class="inside__result-text">Разбираешь свои вопросы с тренером, который сам вернулся в форму после родов.</p>
+            <!-- ФОТО: эфир — тренер с ноутбуком/телефоном на штативе дома; горизонталь 4:3, 1600 px. Лучше заменить на реальный кадр эфира Анны -->
+            <div class="inside__media">
+              <picture class="inside__pic">
+                <source type="image/webp" srcset="assets/img/v4/inside-5-live.webp">
+                <img src="assets/img/v4/inside-5-live.jpg" width="800" height="600" loading="lazy" decoding="async" alt="Прямой эфир из дома: тренер отвечает на вопросы перед камерой">
+              </picture>
+              <span class="inside__art" aria-hidden="true"></span>
+              <p class="inside__num" aria-hidden="true">05</p>
             </div>
-            <span class="inside__tag tag tag--accent">«С куратором» и выше</span>
+            <div class="inside__body">
+              <h4 class="inside__name">Прямые эфиры с Анной</h4>
+              <p class="inside__what">Вопросы, разборы, поддержка в середине пути.</p>
+              <div class="inside__result">
+                <p class="inside__result-label">Результат для тебя</p>
+                <p class="inside__result-text">Разбираешь свои вопросы с тренером, который сам вернулся в форму после родов.</p>
+              </div>
+              <span class="inside__tag tag tag--accent">«С куратором» и выше</span>
+            </div>
           </li>
           </ul>
+          <script>
+            /* «Что внутри» (inside.css): фото проявляется, когда карточка входит в экран. Без JS и при reduced-motion фото видны сразу */
+            (function () {
+              var grid = document.querySelector('.inside__grid');
+              if (!grid || !('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+              grid.classList.add('inside__grid--anim');
+              var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-lit'); io.unobserve(e.target); } });
+              }, { rootMargin: '0px 0px -15% 0px' });
+              Array.prototype.forEach.call(grid.querySelectorAll('.inside__card'), function (c) { io.observe(c); });
+            })();
+          </script>
         </div>
 
         <div class="program__actions section-actions">

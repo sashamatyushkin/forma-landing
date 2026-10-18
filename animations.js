@@ -96,7 +96,12 @@
     var fill = el('span', 'weeks__fill');
     var ticks = el('div', 'weeks__ticks');
     for (var t = 0; t <= 8; t++) ticks.appendChild(el('span', 'weeks__tick'));
-    bar.appendChild(fill); bar.appendChild(ticks);
+    // активная неделя на шкале: подсвеченный отрезок 1/8 (двигается transform) и номера недель над линией
+    var now = el('span', 'weeks__now');
+    bar.appendChild(fill); bar.appendChild(ticks); bar.appendChild(now);
+    var wnums = el('div', 'weeks__wnums');
+    for (var wn = 1; wn <= 8; wn++) wnums.appendChild(el('span', 'weeks__wnum', String(wn)));
+    track.appendChild(wnums);
     var ends = el('div', 'weeks__ends');
     ends.appendChild(el('span', '', '2 ноября'));
     ends.appendChild(el('span', '', '27 декабря'));
@@ -108,7 +113,7 @@
     sun.setAttribute('aria-hidden', 'true');
     weeks.insertBefore(sun, weeks.firstChild);
     $$('.weeks__stage', weeks).forEach(function (s) { s.classList.add('is-lit'); });
-    weeksParts = { track: track, fill: fill, sun: sun, list: list };
+    weeksParts = { track: track, fill: fill, sun: sun, list: list, now: now, wnums: $$('.weeks__wnum', wnums) };
   }
 
   // 1.5. Подсказки на метках видео: текст из сообщения куратора («колени уходят внутрь»)
@@ -420,15 +425,49 @@
     weeks.insertBefore(trail, weeks.firstChild);
     weeks.insertBefore(milk, finish);
 
+    // Карточка «Результат недели»: счётчик «НЕДЕЛЯ N» (display) + результат этой недели.
+    // Тексты берём из статичных списков .weeks__res (они же видны без JS / при reduced-motion
+    // и остаются для скринридеров в режиме пина), поэтому карточка aria-hidden.
+    var results = {};
+    $$('.weeks__res', weeks).forEach(function (r) {
+      var t = $('.weeks__res-text', r);
+      results[r.getAttribute('data-week')] = (t || r).textContent.trim();
+    });
+    var card = el('div', 'weeks__result');
+    card.setAttribute('aria-hidden', 'true');
     var counter = el('div', 'weeks__counter');
-    counter.setAttribute('aria-hidden', 'true');
     counter.appendChild(el('span', 'weeks__counter-label', 'Неделя'));
     var cNum = el('span', 'weeks__counter-num');
     var cStroke = el('span', 'weeks__counter-stroke', '1');
     var cFill = el('span', 'weeks__counter-fill', '8');
     cNum.appendChild(cStroke); cNum.appendChild(cFill);
     counter.appendChild(cNum);
-    ($('.weeks__top', weeks) || weeks).appendChild(counter);
+    var rBody = el('div', 'weeks__result-body');
+    rBody.appendChild(el('span', 'weeks__result-label', 'Результат недели'));
+    var rText = el('p', 'weeks__result-text', results['1'] || '');
+    rBody.appendChild(rText);
+    card.appendChild(counter); card.appendChild(rBody);
+    ($('.weeks__top', weeks) || weeks).appendChild(card);
+
+    // смена недели: уход вверх 120 мс + приход снизу 200 мс (≈320 мс, только opacity/transform)
+    var swapTl = null;
+    function showWeek(w, instant) {
+      var txt = results[String(w)] || '';
+      weeksParts.now.style.setProperty('--w', w - 1);
+      weeksParts.wnums.forEach(function (n, i) { n.classList.toggle('is-active', i === w - 1); n.classList.toggle('is-past', i < w - 1); });
+      if (swapTl) swapTl.kill();
+      if (instant) { cStroke.textContent = String(w); rText.textContent = txt; gsap.set([cStroke, rText], { opacity: 1, y: 0 }); return; }
+      swapTl = gsap.timeline()
+        .to([cStroke, rText], { opacity: 0, y: -10, duration: 0.12, ease: 'power1.in' })
+        .add(function () { cStroke.textContent = String(w); rText.textContent = txt; })
+        .fromTo([cStroke, rText], { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.2, ease: EASE_LIGHT, stagger: 0.03 });
+    }
+    showWeek(1, true);
+
+    // финальная панель: фото выпускниц и кнопка
+    var finMedia = $('.weeks__finish-media', finish);
+    var finItems = $$('.weeks__finish-body, .weeks__finish-actions', finish);
+    var finActions = $('.weeks__finish-actions', finish);
 
     var sunW = 360;
     function stageX(i) {
@@ -442,25 +481,30 @@
     gsap.set(stages, { opacity: 0.45 });
     gsap.set(weeksParts.fill, { scaleX: 0 });
     gsap.set(milk, { opacity: 0 });
-    gsap.set(finish, { opacity: 0, y: 16 });
+    gsap.set(finish, { opacity: 0 });
+    gsap.set(finItems, { opacity: 0, y: 16 });
+    if (finMedia) gsap.set(finMedia, { scale: 1.06, transformOrigin: '50% 50%' });
+    if (finActions) finActions.inert = true;
 
-    var lastWeek = 0, lastStage = -1;
+    var lastWeek = 1, lastStage = -1, finOn = false;
     function onProgress(p) {
       var week = p >= 0.84 ? 8 : Math.min(8, Math.floor(p / 0.105) + 1);
-      if (week !== lastWeek) { lastWeek = week; cStroke.textContent = String(week); counter.classList.toggle('is-done', p >= 0.79); }
-      else counter.classList.toggle('is-done', p >= 0.79);
+      if (week !== lastWeek) { lastWeek = week; showWeek(week); }
+      counter.classList.toggle('is-done', p >= 0.79);
+      // кнопка финиша доступна с клавиатуры только когда панель проявилась
+      var fin = p >= 0.94;
+      if (fin !== finOn && finActions) { finOn = fin; finActions.inert = !fin; }
       var st = p < 0.21 ? 0 : p < 0.42 ? 1 : p < 0.63 ? 2 : 3;
       if (st !== lastStage) {
         lastStage = st;
         stages.forEach(function (s, i) { s.classList.toggle('is-lit', i === st); });
       }
-      // финиш интерактивен только когда проявился (кнопок в нём нет, но не мешаем фокусу)
     }
 
     var tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
-        trigger: weeks, start: 'top top', end: '+=1800',
+        trigger: weeks, start: 'top top', end: '+=2400',
         pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
         onUpdate: function (self) { onProgress(self.progress); },
         onRefresh: function (self) { onProgress(self.progress); }
@@ -480,11 +524,14 @@
           .to(weeksParts.fill, { scaleX: (2 * i + 2) / 8, duration: 0.14 }, t0 + 0.07);
       })(i);
     }
-    // Финал: луч расширяется и заливает комнату светом, проявляется «Финиш 27 декабря»
+    // Финал: луч расширяется и заливает комнату светом, сквозь свет проявляется фото выпускниц
+    // (opacity + scale 1.06→1), затем «Финиш 27 декабря» и кнопка «Начать 2 ноября»
     tl.to(sunEl, { scaleX: 6, duration: 0.1, ease: 'power1.in' }, 0.84)
-      .to(milk, { opacity: 1, duration: 0.1, ease: 'power1.in' }, 0.84)
-      .to([weeksParts.list, weeksParts.track, counter], { opacity: 0, duration: 0.06 }, 0.86)
-      .to(finish, { opacity: 1, y: 0, duration: 0.06 }, 0.94);
+      .to(milk, { opacity: 1, duration: 0.1 }, 0.84)
+      .to([$('.weeks__heading', weeks), weeksParts.list, weeksParts.track, card], { opacity: 0, duration: 0.06 }, 0.86)
+      .to(finish, { opacity: 1, duration: 0.05, ease: 'power1.out' }, 0.92);
+    if (finMedia) tl.to(finMedia, { scale: 1, duration: 0.08, ease: 'power1.out' }, 0.92);
+    tl.to(finItems, { opacity: 1, y: 0, duration: 0.04, stagger: 0.008 }, 0.94);
   } else if (weeks) {
     reveal(weeks, '.weeks__stage', { stagger: 0.1 });
   }

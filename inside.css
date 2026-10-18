@@ -1,0 +1,190 @@
+/* =====================================================================
+   ФОРМА — inside.css (правка v4, исполнитель F)
+   Подблок «Что внутри» (#programma .inside): фото у каждого модуля 01–05.
+   Подключён после bottom.css и перебивает базовые правила .inside__* из styles.css.
+
+   Композиция:
+    - 02, 03, 05 — фото-обложка сверху карточки (200 px);
+    - 01 и 04 (широкие) — фото боковой колонкой: 01 слева, 04 справа,
+      чтобы два ряда «зеркалили» друг друга и карточки не были клонами.
+   Номер модуля лежит на фото (цвет луча на тёмном градиенте снизу).
+   Графика «Луча» поверх фото: столбики трекера (03), пузыри чата (04),
+   метка «эфир» (05). Контурное «30–40» у 01 убрано — дублирует заголовок.
+
+   Анимации — только transform и opacity:
+    - проявление фото: opacity 0→1 + scale 1.04→1, 1000 мс, --ease-light
+      (класс .is-lit ставит IntersectionObserver из index.html);
+    - ховер: zoom фото 1.03 и луч, проходящий по фото; луч по краю карточки — styles.css.
+   Без JS и при prefers-reduced-motion фото видны сразу, без движения.
+
+   Разделы:
+    1. Карточка и тело
+    2. Фото: рамка, тёплая обработка, номер
+    3. Боковая раскладка 01 и 04
+    4. Графика поверх фото
+    5. Проявление и ховер
+    6. prefers-reduced-motion
+   ===================================================================== */
+
+/* ---------- 1. Карточка и тело ---------- */
+.inside {
+  --inside-media-h: 200px;
+  --inside-side-w: 48%;
+}
+.inside .inside__grid { margin-top: 40px; }
+.inside .inside__card {
+  padding: 0;
+  align-items: stretch;
+}
+/* луч по краю (styles.css) — поверх фото */
+.inside .inside__card::before { z-index: 4; }
+
+.inside__body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px 28px 28px;
+}
+.inside .inside__name { margin-top: 0; }
+
+/* ---------- 2. Фото: рамка, тёплая обработка, номер ---------- */
+.inside__media {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  height: var(--inside-media-h);
+  overflow: hidden;
+  background: var(--color-paper-2); /* пока фото грузится — тёплый тон бумаги, не серый */
+}
+.inside__pic { position: absolute; inset: 0; display: block; }
+.inside__pic img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 45%;
+  /* единая тёплая кривая из 03-дизайн.md §2.5: насыщенность 85%, контраст +5%, теплее */
+  filter: saturate(0.85) contrast(1.05) sepia(0.12);
+  transform-origin: 50% 60%;
+  transition: transform var(--dur-slow) var(--ease-light);
+}
+/* тёплая плёнка + тёмный низ под номер (тени не чёрные, а night) */
+.inside__media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(0deg, rgba(20, 16, 13, 0.62) 0%, rgba(20, 16, 13, 0.18) 38%, rgba(20, 16, 13, 0) 60%),
+    linear-gradient(160deg, rgba(255, 199, 176, 0.22) 0%, rgba(255, 159, 74, 0.16) 100%);
+}
+.inside .inside__num {
+  position: absolute;
+  z-index: 2;
+  left: 24px;
+  bottom: 14px;
+  color: var(--color-ray);
+  font-size: 44px;
+  text-shadow: 0 2px 16px rgba(20, 16, 13, 0.35);
+}
+
+/* ---------- 3. Боковая раскладка 01 и 04 ---------- */
+.inside .inside__card--side {
+  display: grid;
+  grid-template-columns: var(--inside-side-w) minmax(0, 1fr);
+}
+.inside .inside__card--side-end { grid-template-columns: minmax(0, 1fr) var(--inside-side-w); }
+.inside__card--side .inside__media { height: auto; min-height: 100%; }
+.inside__card--side-end .inside__media { order: 2; }
+.inside__card--side .inside__body { padding: 32px 32px 28px; }
+/* в широких карточках текст результата — на всю колонку */
+.inside__card--side .inside__what { max-width: 34ch; }
+
+/* ---------- 4. Графика поверх фото ---------- */
+.inside .inside__media .inside__art { z-index: 2; pointer-events: none; }
+
+/* 03 — столбики трекера на «бумажном» бейдже */
+.inside .inside__card--track .inside__art {
+  top: 16px; right: 16px;
+  width: 62px; height: 46px;
+  border-radius: var(--radius-s);
+  background-color: rgba(251, 245, 236, 0.92);
+  background-size: 7px 12px, 7px 18px, 7px 25px, 7px 30px;
+  background-position: 8px calc(100% - 8px), 21px calc(100% - 8px), 34px calc(100% - 8px), 47px calc(100% - 8px);
+  box-shadow: 0 8px 20px -10px rgba(20, 16, 13, 0.5);
+  opacity: 1;
+}
+
+/* 04 — пузыри чата в верхней части фото */
+.inside .inside__card--chat .inside__art { top: 20px; right: 20px; left: auto; width: 196px; height: 86px; }
+.inside .inside__card--chat .inside__art::before { box-shadow: 0 10px 24px -12px rgba(20, 16, 13, 0.6); }
+.inside .inside__card--chat .inside__art::after {
+  top: 44px;
+  background: rgba(255, 213, 151, 0.95);
+  box-shadow: 0 10px 24px -12px rgba(20, 16, 13, 0.6);
+}
+
+/* 05 — метка «эфир», как в интерфейсе трансляции */
+.inside .inside__card--live .inside__art {
+  top: 16px; left: 16px; right: auto;
+  border-color: rgba(245, 235, 221, 0.25);
+  background: rgba(20, 16, 13, 0.72);
+  color: var(--color-milk);
+}
+
+/* ---------- 5. Проявление и ховер ---------- */
+/* стартовое состояние — только когда скрипт включил анимацию (класс на сетке) */
+.inside__grid--anim .inside__pic {
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 1000ms var(--ease-light), transform 1000ms var(--ease-light);
+}
+.inside__grid--anim .inside__card:not(.is-lit) .inside__pic { will-change: opacity, transform; }
+.inside__grid--anim .inside__card.is-lit .inside__pic { opacity: 1; transform: none; }
+.inside__grid--anim .inside__card:nth-child(2) .inside__pic,
+.inside__grid--anim .inside__card:nth-child(5) .inside__pic { transition-delay: 70ms; }
+.inside__grid--anim .inside__card:nth-child(3) .inside__pic { transition-delay: 140ms; }
+
+/* ховер: фото чуть приближается, по нему проходит луч под −24° */
+.inside__card:hover .inside__pic img { transform: scale(1.03); }
+.inside__media::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 38%;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(255, 213, 151, 0) 0%, rgba(255, 213, 151, 0.42) 50%, rgba(255, 213, 151, 0) 100%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: translateX(-120%) rotate(24deg);
+  transition: transform 900ms var(--ease-light), opacity var(--dur-base) var(--ease-light);
+}
+.inside__card:hover .inside__media::after {
+  opacity: 1;
+  transform: translateX(260%) rotate(24deg);
+}
+
+/* ---------- 6. prefers-reduced-motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .inside__grid--anim .inside__pic,
+  .inside__pic { opacity: 1; transform: none; transition: none; }
+  .inside__pic img,
+  .inside__card:hover .inside__pic img { transform: none; transition: none; }
+  .inside__media::after { display: none; }
+}
+
+/* ---------- 7. Скругление фото по форме карточки (страховка к overflow: hidden у композитных слоёв) ---------- */
+.inside__media { border-radius: calc(var(--radius-l) - 1px) calc(var(--radius-l) - 1px) 0 0; }
+.inside__card--side .inside__media { border-radius: calc(var(--radius-l) - 1px) 0 0 calc(var(--radius-l) - 1px); }
+.inside__card--side-end .inside__media { border-radius: 0 calc(var(--radius-l) - 1px) calc(var(--radius-l) - 1px) 0; }
+/* 05: обложка чуть ниже, чтобы второй ряд не вытягивался и у 04 не было пустоты */
+.inside__card--live { --inside-media-h: 184px; }
+/* 01 и 04: в исходниках v4 (inside-1-workout, inside-4-chat) вшиты чёрные полосы сверху и снизу (~33 px из 600).
+   Рамка фото выходит за край на 7% — полосы уходят под overflow. Снять, когда фото перевыгрузят без полос. */
+.inside__card--side .inside__pic { inset: -7% 0; }
