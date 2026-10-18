@@ -10,7 +10,7 @@
     5. Воронка и таблица кампаний (+ экспорт CSV)
     6. «Живость»: лента событий, колокольчик, «сейчас на сайте», обновление
     7. Навигация по разделам и режим «Фокус»
-    8. Редактор цен (+ публикация в localStorage для admin-bridge.js)
+    8. Редактор цен (демо: сохраняется только в localStorage админки)
     9. Редактор контента (+ FAQ с перетаскиванием, история)
    10. Настройки, тосты
    11. Запуск
@@ -18,7 +18,7 @@
    Публикация: localStorage['forma_admin_overrides'] =
      { version: 1, updatedAt, tariffs: { sama|kurator|lichnoe: { early, regular, parts, showBonus, seatsLeft? } },
        content: { hero: { titleAvg, titleA, titleNum, titleB, titleC, cta } } }
-   Этот ключ читает сайт/admin-bridge.js на лендинге (тот же origin).
+   Демо-режим: сайт этот ключ НЕ читает (admin-bridge.js отключён, лежит в проект/архив/).
    ===================================================================== */
 (function () {
   'use strict';
@@ -904,7 +904,7 @@
         prices.published = clone(prices.draft);
         btn.classList.remove('is-loading');
         updatePrices();
-        toast('Цены обновлены на сайте', 'Обнови страницу лендинга, чтобы увидеть новые цены. <a href="../index.html#tarify" target="_blank" rel="noopener">Открыть тарифы</a>', 'ok', true);
+        toast('Цены сохранены (демо)', 'Изменения видны только в админке. На сайт в демо-режиме ничего не отправляется.', 'ok');
         bellAdd('Цены опубликованы', 'Менеджер школы, только что', false);
       }, reduce ? 0 : 700);
     });
@@ -963,7 +963,7 @@
     var input = f.multiline
       ? '<textarea class="field__input" id="' + id + '" rows="3" data-cf="' + f.key + '">' + esc(val) + '</textarea>'
       : '<input class="field__input" id="' + id + '" value="' + esc(val) + '" data-cf="' + f.key + '" autocomplete="off">';
-    return '<div class="field"><div class="field__top"><label class="field__label" for="' + id + '">' + f.label + (f.site ? '<span class="field__site" title="Публикуется на сайт через admin-bridge.js">НА САЙТ</span>' : '') + '</label>' +
+    return '<div class="field"><div class="field__top"><label class="field__label" for="' + id + '">' + f.label + '' + '</label>' +
       '<span class="field__count" data-count="' + f.key + '">' + val.length + '</span></div>' + input + '</div>';
   }
   function faqHtml(b) {
@@ -991,7 +991,7 @@
     $('[data-wys-url]').textContent = 'forma-fit.ru/' + b.anchor;
     var form = $('[data-editor-form]');
     form.innerHTML = b.fields.map(function (f) { return fieldHtml(b, f); }).join('') + (b.faq ? faqHtml(b) : '');
-    $('[data-editor-note]').textContent = b.live ? 'Заголовок и кнопка уйдут на сайт' : 'Демо: сохраняется в админке';
+    $('[data-editor-note]').textContent = 'Демо: сохраняется в админке';
     $$('[data-cf]', form).forEach(function (inp) {
       inp.addEventListener('input', function () {
         var k = inp.getAttribute('data-cf');
@@ -1112,7 +1112,7 @@
       html = '<div class="w-sec w-final"><span class="w-beam"></span><h2 class="w-title">' + F('title') + '</h2><p class="w-lead">' + F('text') + '</p>' +
         '<div><span class="w-btn">' + F('cta') + '</span></div><span class="w-link">' + F('cta2') + '</span><p class="w-lead" style="font-size:13px">14 дней на возврат. Можно долями.</p></div>';
     }
-    html += '<p class="w-note">' + (b.live ? 'Превью. Поля с меткой «На сайт» после публикации появятся на лендинге.' : 'Превью. Демо: тексты этого блока сохраняются только в админке.') + '</p>';
+    html += '<p class="w-note">' + 'Превью. Демо: тексты сохраняются только в админке.' + '</p>';
     $('[data-wys]').innerHTML = html;
   }
 
@@ -1160,8 +1160,7 @@
         if (key === 'hero') publishHeroToSite();
         btn.classList.remove('is-loading');
         renderBlockList(); updateContentStatus();
-        if (BLOCK[key].live) toast('Первый экран обновлён на сайте', 'Заголовок и кнопка применятся после обновления страницы лендинга. <a href="../index.html" target="_blank" rel="noopener">Открыть сайт</a>', 'ok', true);
-        else toast('Блок «' + BLOCK[key].name + '» опубликован', 'Демо: тексты сохранены в админке, на сайт не уходят', 'ok');
+        toast('Блок «' + BLOCK[key].name + '» опубликован', 'Демо: тексты сохранены в админке, на сайт не уходят', 'ok');
       }, reduce ? 0 : 600);
     });
     $('[data-content-revert]').addEventListener('click', function () {
